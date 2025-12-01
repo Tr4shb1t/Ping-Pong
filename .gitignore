@@ -1,2 +1,6 @@
 /.venv
 /.vscode
+/build
+/dist
+test.py
+.DS_Store
