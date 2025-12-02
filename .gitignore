@@ -4,3 +4,4 @@
 /dist
 test.py
 .DS_Store
+.gitignore

@@ -23,6 +23,8 @@ ball_direction_y = random.choice([-4, 4])
 pygame.font.init()
 font = pygame.font.SysFont('Courier New', 30)
 
+sound = pygame.mixer.Sound("sound/ping.mp3")
+
 run = True
 while run:
     pygame.time.delay(15)  # Delay to control frame rate
@@ -39,11 +41,13 @@ while run:
             pass
         elif player1_pos < ball_pos_y + ball_size and player1_pos + player1_barsize > ball_pos_y:
             ball_direction_x = -ball_direction_x
+            pygame.mixer.Sound.play(sound)
     if ball_pos_x >= width - 50 - ball_size:
         if ball_pos_x >= width - 40 - ball_size:
             pass
         elif player2_pos < ball_pos_y + ball_size and player2_pos + player2_barsize > ball_pos_y:
             ball_direction_x = -ball_direction_x
+            pygame.mixer.Sound.play(sound)
     
     if ball_pos_x < -ball_size - 10 or ball_pos_x > width + 10:
         ball_pos_x = (width - ball_size) // 2
