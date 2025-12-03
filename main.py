@@ -20,14 +20,21 @@ ball_pos_y = (height - ball_size) // 2
 ball_direction_x = random.choice([-4, 4])
 ball_direction_y = random.choice([-4, 4])
 
-pygame.font.init()
-font = pygame.font.SysFont('Courier New', 30)
+font = pygame.font.SysFont('Courier New', 50, bold=True)
 
-sound = pygame.mixer.Sound("sound/ping.mp3")
+sound_ping = pygame.mixer.Sound("sound/Ping.mp3")
+sound_pong = pygame.mixer.Sound("sound/Pong.mp3")
+
+def reset_ball():
+    global ball_pos_x, ball_pos_y, ball_direction_x, ball_direction_y
+    ball_pos_x = (width - ball_size) // 2
+    ball_pos_y = (height - ball_size) // 2
+    ball_direction_x = random.choice([-4, 4])
+    ball_direction_y = random.choice([-4, 4])
 
 run = True
 while run:
-    pygame.time.delay(15)  # Delay to control frame rate
+    pygame.time.delay(10)  # Delay to control frame rate
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -41,19 +48,20 @@ while run:
             pass
         elif player1_pos < ball_pos_y + ball_size and player1_pos + player1_barsize > ball_pos_y:
             ball_direction_x = -ball_direction_x
-            pygame.mixer.Sound.play(sound)
+            pygame.mixer.Sound.play(sound_ping)
     if ball_pos_x >= width - 50 - ball_size:
         if ball_pos_x >= width - 40 - ball_size:
             pass
         elif player2_pos < ball_pos_y + ball_size and player2_pos + player2_barsize > ball_pos_y:
             ball_direction_x = -ball_direction_x
-            pygame.mixer.Sound.play(sound)
+            pygame.mixer.Sound.play(sound_pong)
     
-    if ball_pos_x < -ball_size - 10 or ball_pos_x > width + 10:
-        ball_pos_x = (width - ball_size) // 2
-        ball_pos_y = (height - ball_size) // 2
-        ball_direction_x = random.choice([-4, 4])
-        ball_direction_y = random.choice([-4, 4])
+    if ball_pos_x < -ball_size:
+        score[1] += 1
+        reset_ball()
+    if ball_pos_x > width:
+        score[0] += 1
+        reset_ball()
 
     keys = pygame.key.get_pressed()  # Get the state of all keyboard buttons
 
@@ -71,7 +79,8 @@ while run:
             player2_pos += 5
 
     screen.fill((0, 0, 0))  # Fill the screen with black
-
+    score_screen = font.render(f"{score[0]}   {score[1]}", True, (255, 255, 255))
+    screen.blit(score_screen, ((width - score_screen.get_width()) // 2, 20))
     pygame.draw.line(screen, (255, 255, 255), (width // 2, 0), (width // 2, height), 5)  # Draw the center line
     pygame.draw.rect(screen, (255, 255, 255), (20, player1_pos, 30, 130))
     pygame.draw.rect(screen, (255, 255, 255), (750, player2_pos, 30, 130))
