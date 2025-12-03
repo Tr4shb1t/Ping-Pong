@@ -34,7 +34,7 @@ def reset_ball():
 
 run = True
 while run:
-    pygame.time.delay(10)  # Delay to control frame rate
+    pygame.time.delay(15)  # Delay to control frame rate
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
