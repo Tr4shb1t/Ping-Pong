@@ -12,13 +12,13 @@ player1_hight = 130
 player2_hight = 130
 player_thickness = 30
 border_left_right = 20
-game_speed_delay = 15
 
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ping Pong")
 
 ball = pygame.Rect((WIDTH - ball_size) // 2, (HEIGHT - ball_size) // 2, ball_size, ball_size)
-ball_vel = Vector2(1, 0).rotate(random.uniform(-45, 45)) * 5
+ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * 5
 
 player1_pos = (HEIGHT - player1_hight) // 2  # Initial position of the square
 player2_pos = (HEIGHT - player2_hight) // 2  # Initial position of the square
@@ -36,34 +36,31 @@ sound_tor = pygame.mixer.Sound("sound/Tor.mp3")
 def reset_ball():
     global ball_vel, ball
     ball.center = (WIDTH // 2, HEIGHT // 2)
-    ball_vel = Vector2(1, 0).rotate(random.uniform(-45, 45)) * 5
+    ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * 5
 
 run = True
 while run:
-    pygame.time.delay(game_speed_delay)  # Delay to control frame rate
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     keys = pygame.key.get_pressed()  # Get the state of all keyboard buttons
 
-    if keys[pygame.K_w]:
-        if player1_pos > 0:
-            player1_pos -= 5
-    if keys[pygame.K_s]:
-        if player1_pos < HEIGHT - player1_hight:
-            player1_pos += 5 
-    if keys[pygame.K_UP]:
-        if player2_pos > 0:
-            player2_pos -= 5
-    if keys[pygame.K_DOWN]:
-        if player2_pos < HEIGHT - player2_hight:
-            player2_pos += 5
+    if keys[pygame.K_w] and player1_pos > 0:
+        player1_pos -= 5
+    if keys[pygame.K_s] and player1_pos < HEIGHT - player1_hight:
+        player1_pos += 5 
+    if keys[pygame.K_UP] and player2_pos > 0:
+        player2_pos -= 5
+    if keys[pygame.K_DOWN] and player2_pos < HEIGHT - player2_hight:
+        player2_pos += 5
     if keys[pygame.K_r]:
         score = [0, 0]
         reset_ball()
     if keys[pygame.K_ESCAPE]:
         run = False
+    if keys[pygame.K_SPACE]:
+        reset_ball()
 
     # Bewegung
     ball.x += ball_vel.x
@@ -74,7 +71,7 @@ while run:
         ball_vel = ball_vel.reflect(Vector2(0, 1))
         pygame.mixer.Sound.play(sound_rand)
 
-    # Paddle collision
+    # Schlägerkollision
     if ball.colliderect(player1) and ball_vel.x < 0 and ball.left >= player1.right - 10:
         hit_pos = ball.centery - player1.centery
         hit_norm = hit_pos / (player1.height / 2)
@@ -112,5 +109,6 @@ while run:
     pygame.draw.rect(screen, (255, 255, 255), ball)
     
     pygame.display.flip()  # Update the display
+    clock.tick(60)
 
 pygame.quit()
