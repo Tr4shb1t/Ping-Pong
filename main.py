@@ -12,13 +12,14 @@ player1_hight = 130
 player2_hight = 130
 player_thickness = 30
 border_left_right = 20
+game_speed = 5
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ping Pong")
 
 ball = pygame.Rect((WIDTH - ball_size) // 2, (HEIGHT - ball_size) // 2, ball_size, ball_size)
-ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * 5
+ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * game_speed
 
 player1_pos = (HEIGHT - player1_hight) // 2  # Initial position of the square
 player2_pos = (HEIGHT - player2_hight) // 2  # Initial position of the square
@@ -34,9 +35,10 @@ sound_rand = pygame.mixer.Sound("sound/Rand.mp3")
 sound_tor = pygame.mixer.Sound("sound/Tor.mp3")
 
 def reset_ball():
-    global ball_vel, ball
+    global ball_vel, ball, game_speed
     ball.center = (WIDTH // 2, HEIGHT // 2)
-    ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * 5
+    ball_vel = Vector2(random.choice([-1, 1]), 0).rotate(random.uniform(-45, 45)) * game_speed
+    pygame.time.delay(1000)
 
 run = True
 while run:
@@ -47,13 +49,13 @@ while run:
     keys = pygame.key.get_pressed()  # Get the state of all keyboard buttons
 
     if keys[pygame.K_w] and player1_pos > 0:
-        player1_pos -= 5
+        player1_pos -= game_speed
     if keys[pygame.K_s] and player1_pos < HEIGHT - player1_hight:
-        player1_pos += 5 
+        player1_pos += game_speed 
     if keys[pygame.K_UP] and player2_pos > 0:
-        player2_pos -= 5
+        player2_pos -= game_speed
     if keys[pygame.K_DOWN] and player2_pos < HEIGHT - player2_hight:
-        player2_pos += 5
+        player2_pos += game_speed
     if keys[pygame.K_r]:
         score = [0, 0]
         reset_ball()
@@ -78,7 +80,7 @@ while run:
         ball_vel = ball_vel.reflect(Vector2(1, 0))
         angle_change = hit_norm * 45
         ball_vel = ball_vel.rotate(angle_change)
-        ball_vel = ball_vel.normalize() * 5
+        ball_vel = ball_vel.normalize() * game_speed
         pygame.mixer.Sound.play(sound_ping)
 
     if ball.colliderect(player2) and ball_vel.x > 0 and ball.right <= player2.left + 10:
@@ -87,7 +89,7 @@ while run:
         ball_vel = ball_vel.reflect(Vector2(-1, 0))
         angle_change = hit_norm * 45
         ball_vel = ball_vel.rotate(-angle_change)
-        ball_vel = ball_vel.normalize() * 5
+        ball_vel = ball_vel.normalize() * game_speed
         pygame.mixer.Sound.play(sound_pong)
     
     if ball.x < -ball_size:
@@ -100,14 +102,18 @@ while run:
         pygame.mixer.Sound.play(sound_tor)
         reset_ball()
 
+    if game_speed < 15:
+        game_speed += 0.001  # Increase game speed over time
+
     screen.fill((0, 0, 0))  # Fill the screen with black
     score_screen = font.render(f"{score[0]}   {score[1]}", True, (255, 255, 255))
     screen.blit(score_screen, ((WIDTH - score_screen.get_width()) // 2, 20))
-    pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2, 0), (WIDTH // 2, HEIGHT), 3)  # Draw the center line
+    for line in range(0, HEIGHT, HEIGHT // 20):
+        pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2, line), (WIDTH // 2, line + HEIGHT // 41), 4)
     player1 = pygame.draw.rect(screen, (255, 255, 255), (border_left_right, player1_pos, player_thickness, player1_hight))
     player2 = pygame.draw.rect(screen, (255, 255, 255), (WIDTH - border_left_right - player_thickness, player2_pos, player_thickness, player2_hight))
     pygame.draw.rect(screen, (255, 255, 255), ball)
-    
+
     pygame.display.flip()  # Update the display
     clock.tick(60)
 
